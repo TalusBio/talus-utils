@@ -1,0 +1,11 @@
+{
+  "_template": "https://github.com/TalusBio/cookiecutter-hypermodern-python",
+  "author": "Rico Meinl",
+  "email": "rmeinl@talus.bio",
+  "friendly_name": "Talus Utils",
+  "github_user": "rmeinl",
+  "license": "MIT",
+  "package_name": "talus_utils",
+  "project_name": "talus-utils",
+  "version": "0.0.0"
+}
