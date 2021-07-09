@@ -1,8 +1,7 @@
 """Test cases for the fasta module."""
 import pytest
 
-from talus_utils.fasta import parse_fasta_header
-from talus_utils.fasta import parse_fasta_header_uniprot_entry
+from talus_utils.fasta import parse_fasta_header, parse_fasta_header_uniprot_entry
 
 
 def test_parse_fasta_header_valid() -> None:

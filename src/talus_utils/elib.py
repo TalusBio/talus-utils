@@ -1,11 +1,12 @@
 """src/talus_utils/elib.py"""
 import sqlite3
 import tempfile
+
 from sqlite3.dbapi2 import Cursor
-from typing import Optional
-from typing import Union
+from typing import Optional, Union
 
 import pandas as pd
+
 from talus_aws_utils.s3 import _read_object
 
 

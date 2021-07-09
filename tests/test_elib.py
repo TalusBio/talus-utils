@@ -1,7 +1,8 @@
-"""Test cases for the elib module."""
+"""tests/test_elib.py"""
 from pathlib import Path
 
 import pandas as pd
+
 from deepdiff import DeepDiff
 
 from talus_utils.elib import Elib
