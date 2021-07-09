@@ -34,14 +34,14 @@ def copy(func: Callable) -> Callable:
     return wrapped_func
 
 
-def drop_na(*pd_args, **pd_kwargs) -> Callable:
+def dropna(*pd_args, **pd_kwargs) -> Callable:
     """Function decorator that drops NaN values in a pandas DataFrame argument.
 
     Returns:
         Callable: The wrapped function.
     """
 
-    def drop_na_wrap(func: Callable) -> Callable:
+    def dropna_wrap(func: Callable) -> Callable:
         """Function decorator that drops NaN values in a pandas DataFrame argument."""
 
         @functools.wraps(func)
@@ -55,7 +55,7 @@ def drop_na(*pd_args, **pd_kwargs) -> Callable:
 
         return wrapped_func
 
-    return drop_na_wrap
+    return dropna_wrap
 
 
 def log_scaling(

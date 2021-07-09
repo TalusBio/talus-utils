@@ -60,7 +60,7 @@ def test_dropna() -> None:
     )
     df_expected = df_input.dropna()
 
-    df_actual = dataframe.drop_na()(dummy_function)(df_input)
+    df_actual = dataframe.dropna()(dummy_function)(df_input)
     assert_frame_equal(df_actual, df_expected)
 
 
@@ -71,7 +71,7 @@ def test_dropna_column() -> None:
     )
     df_expected = pd.DataFrame([{"test": "a"}, {"test": "c"}])
 
-    df_actual = dataframe.drop_na(axis=1)(dummy_function)(df_input)
+    df_actual = dataframe.dropna(axis=1)(dummy_function)(df_input)
     assert_frame_equal(df_actual, df_expected)
 
 
