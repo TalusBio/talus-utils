@@ -1,6 +1,8 @@
 """src/talus_utils/plot.py"""
 
-from typing import List, Set, Tuple
+import functools
+
+from typing import Any, Callable, List, Set, Tuple
 
 import matplotlib.pyplot as plt
 import plotly.graph_objects as go
@@ -9,6 +11,27 @@ from matplotlib_venn import venn2, venn3
 from scipy.special import binom
 
 from .constants import PRIMARY_COLOR, SECONDARY_COLOR
+
+
+def update_layout(*px_args, **px_kwargs) -> Callable:
+    """Function decorator that overrides the layout of a Plotly Figure.
+
+    Returns:
+        Callable: The wrapped function.
+    """
+
+    def update_layout_wrap(func: Callable) -> Callable:
+        """Function decorator that overrides the layout of a Plotly Figure."""
+
+        @functools.wraps(func)
+        def wrapped_func(*args, **kwargs) -> Any:
+            return_value = func(*args, **kwargs)
+            return_value.update_layout(*px_args, **px_kwargs)
+            return return_value
+
+        return wrapped_func
+
+    return update_layout_wrap
 
 
 def venn(

@@ -9,6 +9,7 @@ from talus_utils.constants import EPSILON
 
 
 def assert_frame_not_equal(*args, **kwargs):
+    """The inverse of pandas.testing.assert_frame_equal."""
     try:
         assert_frame_equal(*args, **kwargs)
     except AssertionError:
@@ -20,10 +21,12 @@ def assert_frame_not_equal(*args, **kwargs):
 
 
 def dummy_function_change_df_column(df: pd.DataFrame) -> None:
+    """A dummy function that changes the input df's column."""
     df["test"] = "dummy_value"
 
 
 def dummy_function(df: pd.DataFrame) -> pd.DataFrame:
+    """A dummy function that just returns the input DataFrame."""
     return df
 
 
