@@ -26,7 +26,8 @@ def update_layout(*px_args, **px_kwargs) -> Callable:
         @functools.wraps(func)
         def wrapped_func(*args, **kwargs) -> Any:
             return_value = func(*args, **kwargs)
-            return_value.update_layout(*px_args, **px_kwargs)
+            if type(return_value) == go.Figure:
+                return return_value.update_layout(*px_args, **px_kwargs)
             return return_value
 
         return wrapped_func

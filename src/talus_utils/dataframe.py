@@ -7,7 +7,6 @@ from typing import Any, Callable
 import numpy as np
 import pandas as pd
 
-from .constants import EPSILON
 from .utils import override_args, override_kwargs
 
 
@@ -65,7 +64,7 @@ def log_scaling(
 
     Args:
         log_function (Callable, optional): The logarithm function to apply. Defaults to np.log10.
-        filter_outliers (bool, optional): If False, add a small epsilon to each value to avoid np.log of 0. Defaults to True.
+        filter_outliers (bool, optional): If False, set all values below 1 to 1 to ensure np.log works. Defaults to True.
 
     Returns:
         Callable: The wrapped function.
@@ -77,11 +76,9 @@ def log_scaling(
         @functools.wraps(func)
         def wrapped_func(*args, **kwargs) -> Any:
             if filter_outliers:
-                apply_func = lambda df: log_function(df).replace(
-                    [np.inf, -np.inf], np.nan
-                )
+                apply_func = lambda df: log_function(df.where(df >= 1))
             else:
-                apply_func = lambda df: log_function(df + EPSILON)
+                apply_func = lambda df: log_function(df.mask(df < 1, 1))
             filter_func = lambda arg: type(arg) == pd.DataFrame
             args = override_args(args=args, func=apply_func, filter=filter_func)
             kwargs = override_kwargs(kwargs=kwargs, func=apply_func, filter=filter_func)
