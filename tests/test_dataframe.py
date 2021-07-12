@@ -5,7 +5,6 @@ import pandas as pd
 from pandas.testing import assert_frame_equal
 
 from talus_utils import dataframe
-from talus_utils.constants import EPSILON
 
 
 def assert_frame_not_equal(*args, **kwargs):
@@ -99,16 +98,16 @@ def test_log_scaling_custom_log() -> None:
 def test_log_scaling_with_zeros() -> None:
     """Tests the log_scaling decorator with zeros (should be filtered out and set to NaN)."""
     df_input = pd.DataFrame([{"test": 25, "test2": 0}, {"test": 26, "test2": 42}])
-    df_expected = np.log10(df_input).replace([np.inf, -np.inf], np.nan)
+    df_expected = np.log10(df_input.where(df_input >= 1))
 
     df_actual = dataframe.log_scaling()(dummy_function)(df_input)
     assert_frame_equal(df_actual, df_expected)
 
 
 def test_log_scaling_with_zeros_no_filter_outliers() -> None:
-    """Tests the log_scaling decorator with zeros and without filtering outliers (small epsilon added)."""
+    """Tests the log_scaling decorator with zeros and without filtering outliers."""
     df_input = pd.DataFrame([{"test": 25, "test2": 0}, {"test": 26, "test2": 42}])
-    df_expected = np.log10(df_input + EPSILON)
+    df_expected = np.log10(df_input.mask(df_input < 1, 1))
 
     df_actual = dataframe.log_scaling(filter_outliers=False)(dummy_function)(df_input)
     assert_frame_equal(df_actual, df_expected)
