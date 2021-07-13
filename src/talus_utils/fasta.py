@@ -46,3 +46,22 @@ def parse_fasta_header_uniprot_entry(fasta_header: str) -> Tuple[str, str]:
             "Invalid Fasta Header Entry Name. It needs to follow the format: ProteinName_SpeciesName."
         )
     return protein_name, species_name
+
+
+def parse_fasta_header_uniprot_protein(fasta_header: str) -> str:
+    """Extracts the Protein name from a fasta header in the format:
+    db|UniqueIdentifier|EntryName. The EntryName field has the format
+    ProteinName_SpeciesName according to https://www.uniprot.org/help/entry_name
+    and this function extracts the Protein name.
+
+    Args:
+        fasta_header (str): [description]
+
+    Raises:
+        ValueError: If the fasta header EntryName doesn't follow the format: ProteinName_SpeciesName.
+
+    Returns:
+        str: The ProteinName of the EntryName field of the given fasta header.
+    """
+    protein_name, _ = parse_fasta_header_uniprot_entry(fasta_header=fasta_header)
+    return protein_name

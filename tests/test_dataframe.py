@@ -1,4 +1,6 @@
 """tests/test_dataframe.py"""
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
 import pytest
@@ -6,6 +8,10 @@ import pytest
 from pandas.testing import assert_frame_equal
 
 from talus_utils import dataframe
+from talus_utils.fasta import parse_fasta_header_uniprot_protein
+
+
+DATA_DIR = Path(__file__).resolve().parent.joinpath("data")
 
 
 def assert_frame_not_equal(*args, **kwargs):
@@ -80,7 +86,7 @@ def test_dropna_column() -> None:
 
 def test_log_scaling() -> None:
     """Tests the log_scaling decorator."""
-    df_input = pd.DataFrame(np.random.rand(5, 5) * 100)
+    df_input = pd.DataFrame(np.random.rand(5, 5) * 500)
     df_expected = np.log10(df_input)
 
     df_actual = dataframe.log_scaling()(dummy_function)(df_input)
@@ -162,6 +168,15 @@ def test_normalize_column() -> None:
     df_expected = df_input.apply(lambda x: x / x.sum(), axis=0)
 
     df_actual = dataframe.normalize(how="column")(dummy_function)(df_input)
+    assert_frame_equal(df_actual, df_expected)
+
+
+def test_normalize_median_column() -> None:
+    """Tests the normalize decorator with how='median_column'."""
+    df_input = pd.DataFrame(np.random.rand(5, 5) * 100)
+    df_expected = df_input - df_input.median(axis=0)
+
+    df_actual = dataframe.normalize(how="median_column")(dummy_function)(df_input)
     assert_frame_equal(df_actual, df_expected)
 
 
@@ -316,3 +331,45 @@ def test_sort_row_values_sum() -> None:
 
     df_actual = dataframe.sort_row_values(how="sum")(dummy_function)(df_input)
     assert_frame_equal(df_actual, df_desc_expected)
+
+
+def test_explode() -> None:
+    """Tests the explode_column decorator."""
+    df_input = pd.DataFrame(
+        {
+            "A": [[0, 1, 2], "foo", [], [3, 4]],
+            "B": 1,
+            "C": 2,
+        }
+    )
+    df_expected = df_input.explode(column="A")
+
+    df_actual = dataframe.explode(column="A")(dummy_function)(df_input)
+    assert_frame_equal(df_actual, df_expected)
+
+
+def test_update_column() -> None:
+    """Tests the update_column decorator."""
+    df_input = pd.read_csv(DATA_DIR.joinpath("select_peptidetoprotein.csv"))
+    df_expected = df_input.copy(deep=True)
+    df_expected["ProteinAccession"] = df_expected["ProteinAccession"].apply(
+        parse_fasta_header_uniprot_protein
+    )
+
+    df_actual = dataframe.update_column(
+        column="ProteinAccession", update_func=parse_fasta_header_uniprot_protein
+    )(dummy_function)(df_input)
+
+    assert_frame_equal(df_actual, df_expected)
+
+
+def test_update_and_explode() -> None:
+    """Tests the update_column and explode decorators."""
+    df_input = pd.read_csv(DATA_DIR.joinpath("peptide_proteins_to_explode.csv"))
+    df_expected = df_input.copy(deep=True)
+    df_expected["Protein"] = df_expected["Protein"].apply(lambda x: x.split(";"))
+    df_expected = df_expected.explode(column="Protein")
+
+    df_actual = dataframe.explode(column="Protein", sep=";")(dummy_function)(df_input)
+
+    assert_frame_equal(df_actual, df_expected)

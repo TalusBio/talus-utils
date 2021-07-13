@@ -2,7 +2,7 @@
 
 import functools
 
-from typing import Any, Callable
+from typing import Any, Callable, Tuple, Union
 
 import numpy as np
 import pandas as pd
@@ -118,7 +118,11 @@ def normalize(how: str) -> Callable:
     """Function decorator that applies a row or column normalization to a pandas DataFrame argument.
 
     Args:
-        how (str): The normalization method to apply. Can be one of {'row', 'colum', 'minmax'}.
+        how (str): The normalization method to apply. Can be one of {'row', 'colum', 'minmax', 'median_column'}.
+        'row': Normalize each row to the range [0, 1].
+        'colum': Normalize each column to the range [0, 1].
+        'minmax': Apply a min-max normalization.
+        'median_column': Scale each column by subtracting the median value.
 
     Raises:
         ValueError: If the given argument is not one of {'row', 'colum', 'minmax'}.
@@ -138,6 +142,8 @@ def normalize(how: str) -> Callable:
                 apply_func = lambda df: df.apply(lambda x: x / x.sum(), axis=0)
             elif how.lower() in set(["minmax", "min-max", "min_max"]):
                 apply_func = lambda df: (df - df.min()) / (df.max() - df.min())
+            elif how.lower() in set(["median_column", "median_col"]):
+                apply_func = lambda df: df - df.median(axis=0)
             else:
                 raise ValueError(
                     "Invalid input value for 'how'. Needs to be one of {'row', 'colum', 'minmax'}."
@@ -254,3 +260,69 @@ def sort_row_values(
         return wrapped_func
 
     return reindex_wrap
+
+
+def explode(
+    column: Union[str, Tuple], ignore_index: bool = False, sep: str = None
+) -> Callable:
+    """Function decorator that explodes a column in a given pandas DataFrame argument.
+
+    Args:
+        column (Union[str, Tuple]): The column to explode.
+        ignore_index (bool, optional): If True, the resulting index will be labeled 0, 1, …, n - 1.. Defaults to False.
+        sep (str, optional): The string to use to separate values in the resulting DataFrame. Defaults to None.
+
+    Returns:
+        Callable: The wrapped function.
+    """
+
+    def explode_wrap(func: Callable) -> Callable:
+        """Function decorator that explodes a column in a given pandas DataFrame argument."""
+
+        @functools.wraps(func)
+        def wrapped_func(*args, **kwargs) -> Any:
+            if sep:
+                apply_func = lambda df: df.assign(
+                    **{column: df[column].apply(lambda row: row.split(sep))}
+                ).explode(column=column, ignore_index=ignore_index)
+            else:
+                apply_func = lambda df: df.explode(
+                    column=column, ignore_index=ignore_index
+                )
+            filter_func = lambda arg: type(arg) == pd.DataFrame
+            args = override_args(args=args, func=apply_func, filter=filter_func)
+            kwargs = override_kwargs(kwargs=kwargs, func=apply_func, filter=filter_func)
+            return_value = func(*args, **kwargs)
+            return return_value
+
+        return wrapped_func
+
+    return explode_wrap
+
+
+def update_column(column: str, update_func: Callable) -> Callable:
+    """Function decorator that applies a given function to a column in a given pandas DataFrame argument.
+
+    Args:
+        column_name (str): The name of the column to update.
+        apply_func (Callable): The function to apply to the column.
+
+    Returns:
+        Callable: The wrapped function.
+    """
+
+    def update_column_wrap(func: Callable) -> Callable:
+        """Function decorator that exploded a column in a given pandas DataFrame argument."""
+
+        @functools.wraps(func)
+        def wrapped_func(*args, **kwargs) -> Any:
+            apply_func = lambda df: df.assign(**{column: df[column].apply(update_func)})
+            filter_func = lambda arg: type(arg) == pd.DataFrame
+            args = override_args(args=args, func=apply_func, filter=filter_func)
+            kwargs = override_kwargs(kwargs=kwargs, func=apply_func, filter=filter_func)
+            return_value = func(*args, **kwargs)
+            return return_value
+
+        return wrapped_func
+
+    return update_column_wrap
