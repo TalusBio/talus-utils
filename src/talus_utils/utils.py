@@ -1,11 +1,13 @@
 """src/talus_utils/utils.py module."""
 
-from typing import Callable, Dict, List, Tuple
+from typing import Any, Callable, Dict, Tuple
 
 
 def override_args(
-    args: Tuple, func: Callable, filter: Callable = lambda _: True
-) -> List:
+    args: Tuple[str, ...],
+    func: Callable[..., Any],
+    filter: Callable[..., Any] = lambda _: True,
+) -> Tuple[Any, ...]:
     """Override the args of a function given a function to apply and an optional filter.
 
     Parameters
@@ -23,12 +25,14 @@ def override_args(
         The changed args as a List.
 
     """
-    return [func(arg) if filter(arg) else arg for arg in list(args)]
+    return tuple([func(arg) if filter(arg) else arg for arg in list(args)])
 
 
 def override_kwargs(
-    kwargs: Tuple, func: Callable, filter: Callable = lambda _: True
-) -> Dict:
+    kwargs: Dict[str, str],
+    func: Callable[..., Any],
+    filter: Callable[..., Any] = lambda _: True,
+) -> Dict[str, str]:
     """Override the kwargs of a function given a function to apply and an optional filter.
 
     Parameters

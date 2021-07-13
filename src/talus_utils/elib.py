@@ -2,6 +2,7 @@
 import sqlite3
 import tempfile
 
+from pathlib import Path
 from sqlite3.dbapi2 import Cursor
 from typing import Optional, Union
 
@@ -13,7 +14,7 @@ from talus_aws_utils.s3 import _read_object
 class Elib:
     """Handle easy interactions with .elib files."""
 
-    def __init__(self, key_or_filename: str, bucket: Optional[str] = None):
+    def __init__(self, key_or_filename: Union[Path, str], bucket: Optional[str] = None):
         """Initialize a new SQLite connection to a file by downloading it as a tmp file.
 
         Parameters

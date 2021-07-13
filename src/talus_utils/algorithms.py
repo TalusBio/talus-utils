@@ -166,7 +166,7 @@ def hit_selection(
 
 def subcellular_enrichment_scores(
     proteins_with_locations: pd.DataFrame, expected_fractions_of_locations: pd.DataFrame
-):
+) -> pd.DataFrame:
     """Calculate the enrichment score for each location in the whole dataframe.
 
     Parameters
@@ -178,8 +178,8 @@ def subcellular_enrichment_scores(
 
     Returns
     -------
-    enrichment_scores : pd.Series
-        a pandas Series of enrichment scores
+    enrichment_scores : pd.DataFrame
+        A pandas data frame of enrichment scores.
 
     """
     for sample in proteins_with_locations["Sample"].unique():

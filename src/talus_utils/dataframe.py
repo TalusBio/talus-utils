@@ -2,7 +2,7 @@
 
 import functools
 
-from typing import Any, Callable, Tuple, Union
+from typing import Any, Callable, Optional, Union
 
 import numpy as np
 import pandas as pd
@@ -10,22 +10,22 @@ import pandas as pd
 from .utils import override_args, override_kwargs
 
 
-def copy(func: Callable) -> Callable:
+def copy(func: Callable[..., Any]) -> Callable[..., Any]:
     """Create a deep copy of a given pandas DataFrame and substitute it in the arguments.
 
     Parameters
     ----------
-    func: Callable :
+    func: Callable[..., Any] :
         The input function.
 
     Returns
     -------
-    Callable
+    Callable[..., Any]
         The wrapped function.
     """
 
     @functools.wraps(func)
-    def wrapped_func(*args, **kwargs) -> Any:
+    def wrapped_func(*args: str, **kwargs: str) -> Any:
         """Substitute the arguments that are pandas DataFrames with a deep copy.
 
         Parameters
@@ -51,7 +51,7 @@ def copy(func: Callable) -> Callable:
     return wrapped_func
 
 
-def dropna(*pd_args, **pd_kwargs) -> Callable:
+def dropna(*pd_args: Union[int, str], **pd_kwargs: str) -> Callable[..., Any]:
     """Drop NaN values in a pandas DataFrame argument.
 
     Parameters
@@ -63,28 +63,28 @@ def dropna(*pd_args, **pd_kwargs) -> Callable:
 
     Returns
     -------
-    Callable
+    Callable[..., Any]
         The wrapped function.
 
     """
 
-    def dropna_wrap(func: Callable) -> Callable:
+    def dropna_wrap(func: Callable[..., Any]) -> Callable[..., Any]:
         """Drop NaN values in a pandas DataFrame argument.
 
         Parameters
         ----------
-        func: Callable :
+        func: Callable[..., Any] :
             The input function.
 
         Returns
         -------
-        Callable
+        Callable[..., Any]
             The wrapped function.
 
         """
 
         @functools.wraps(func)
-        def wrapped_func(*args, **kwargs) -> Any:
+        def wrapped_func(*args: str, **kwargs: str) -> Any:
             apply_func = lambda df: df.dropna(*pd_args, **pd_kwargs)
             filter_func = lambda arg: type(arg) == pd.DataFrame
             args = override_args(args=args, func=apply_func, filter=filter_func)
@@ -98,41 +98,41 @@ def dropna(*pd_args, **pd_kwargs) -> Callable:
 
 
 def log_scaling(
-    log_function: Callable = np.log10, filter_outliers: bool = True
-) -> Callable:
+    log_function: Callable[..., Any] = np.log10, filter_outliers: bool = True
+) -> Callable[..., Any]:
     """Apply a log scale to a given pandas DataFrame argument.
 
     Parameters
     ----------
-    log_function : Callable
+    log_function : Callable[..., Any]
         The logarithm function to apply. (Default value = np.log10).
     filter_outliers : bool
         If False, set all values below 1 to 1 to ensure np.log works. (Default value = True).
 
     Returns
     -------
-    Callable
+    Callable[..., Any]
         The wrapped function.
 
     """
 
-    def log_scaling_wrap(func: Callable) -> Callable:
+    def log_scaling_wrap(func: Callable[..., Any]) -> Callable[..., Any]:
         """Apply a log scale to a given pandas DataFrame argument.
 
         Parameters
         ----------
-        func: Callable :
+        func: Callable[..., Any] :
             The input function.
 
         Returns
         -------
-        Callable
+        Callable[..., Any]
             The wrapped function.
 
         """
 
         @functools.wraps(func)
-        def wrapped_func(*args, **kwargs) -> Any:
+        def wrapped_func(*args: str, **kwargs: str) -> Any:
             if filter_outliers:
                 apply_func = lambda df: log_function(df.where(df >= 1))
             else:
@@ -148,7 +148,7 @@ def log_scaling(
     return log_scaling_wrap
 
 
-def pivot_table(*pd_args, **pd_kwargs) -> Callable:
+def pivot_table(*pd_args: str, **pd_kwargs: str) -> Callable[..., Any]:
     """Apply a pivot to a pandas DataFrame argument.
 
     Parameters
@@ -160,28 +160,28 @@ def pivot_table(*pd_args, **pd_kwargs) -> Callable:
 
     Returns
     -------
-    Callable
+    Callable[..., Any]
         The wrapped function.
 
     """
 
-    def pivot_table_wrap(func: Callable) -> Callable:
+    def pivot_table_wrap(func: Callable[..., Any]) -> Callable[..., Any]:
         """Apply a pivot to a given pandas DataFrame argument.
 
         Parameters
         ----------
-        func: Callable :
+        func: Callable[..., Any] :
             The input function.
 
         Returns
         -------
-        Callable
+        Callable[..., Any]
             The wrapped function.
 
         """
 
         @functools.wraps(func)
-        def wrapped_func(*args, **kwargs) -> Any:
+        def wrapped_func(*args: str, **kwargs: str) -> Any:
             apply_func = lambda df: df.pivot_table(*pd_args, **pd_kwargs)
             filter_func = lambda arg: type(arg) == pd.DataFrame
             args = override_args(args=args, func=apply_func, filter=filter_func)
@@ -194,7 +194,7 @@ def pivot_table(*pd_args, **pd_kwargs) -> Callable:
     return pivot_table_wrap
 
 
-def normalize(how: str) -> Callable:
+def normalize(how: str) -> Callable[..., Any]:
     """Apply a row or column normalization to a pandas DataFrame argument.
 
     Parameters
@@ -208,28 +208,28 @@ def normalize(how: str) -> Callable:
 
     Returns
     -------
-    Callable
+    Callable[..., Any]
         The wrapped function.
 
     """
 
-    def normalize_wrap(func: Callable) -> Callable:
+    def normalize_wrap(func: Callable[..., Any]) -> Callable[..., Any]:
         """Apply a row or column normalization to a pandas DataFrame argument.
 
         Parameters
         ----------
-        func: Callable :
+        func: Callable[..., Any] :
             The input function.
 
         Returns
         -------
-        Callable
+        Callable[..., Any]
             The wrapped function.
 
         """
 
         @functools.wraps(func)
-        def wrapped_func(*args, **kwargs) -> Any:
+        def wrapped_func(*args: str, **kwargs: str) -> Any:
             if how.lower() in set(["row", "r"]):
                 apply_func = lambda df: df.apply(lambda x: x / x.sum(), axis=1)
             elif how.lower() in set(["column", "col", "c"]):
@@ -255,8 +255,10 @@ def normalize(how: str) -> Callable:
 
 
 def sort_row_values(
-    how: str, use_absolute_values: bool = False, sort_ascending: bool = False
-) -> Callable:
+    how: str,
+    use_absolute_values: Optional[bool] = False,
+    sort_ascending: Optional[bool] = False,
+) -> Callable[..., Any]:
     """Reindex a pandas DataFrame argument.
 
     Parameters
@@ -270,28 +272,28 @@ def sort_row_values(
 
     Returns
     -------
-    Callable
+    Callable[..., Any]
         The wrapped function.
 
     """
 
-    def reindex_wrap(func: Callable) -> Callable:
+    def reindex_wrap(func: Callable[..., Any]) -> Callable[..., Any]:
         """Reindexe a pandas DataFrame argument.
 
         Parameters
         ----------
-        func: Callable :
+        func: Callable[..., Any] :
             The input function.
 
         Returns
         -------
-        Callable
+        Callable[..., Any]
             The wrapped function.
 
         """
 
         @functools.wraps(func)
-        def wrapped_func(*args, **kwargs) -> Any:
+        def wrapped_func(*args: str, **kwargs: str) -> Any:
             if how.lower() == "min":
                 if use_absolute_values:
                     apply_func = lambda df: df.reindex(
@@ -373,43 +375,45 @@ def sort_row_values(
 
 
 def explode(
-    column: Union[str, Tuple], ignore_index: bool = False, sep: str = None
-) -> Callable:
+    column: str,
+    ignore_index: Optional[bool] = False,
+    sep: Optional[str] = None,
+) -> Callable[..., Any]:
     """Explode a column in a given pandas DataFrame argument.
 
     Parameters
     ----------
-    column : Union[str, Tuple]
+    column : str
         The column to explode.
-    ignore_index : bool
+    ignore_index : Optional[bool]
         If True, the resulting index will be labeled 0, 1, …, n - 1. (Default value = False).
-    sep : str
+    sep : Optional[str]
         The string to use to separate values in the resulting DataFrame. (Default value = None).
 
     Returns
     -------
-    Callable
+    Callable[..., Any]
         The wrapped function.
 
     """
 
-    def explode_wrap(func: Callable) -> Callable:
+    def explode_wrap(func: Callable[..., Any]) -> Callable[..., Any]:
         """Explode a column in a given pandas DataFrame argument.
 
         Parameters
         ----------
-        func: Callable :
+        func: Callable[..., Any] :
             The input function.
 
         Returns
         -------
-        Callable
+        Callable[..., Any]
             The wrapped function.
 
         """
 
         @functools.wraps(func)
-        def wrapped_func(*args, **kwargs) -> Any:
+        def wrapped_func(*args: str, **kwargs: str) -> Any:
             if sep:
                 apply_func = lambda df: df.assign(
                     **{column: df[column].apply(lambda row: row.split(sep))}
@@ -429,40 +433,40 @@ def explode(
     return explode_wrap
 
 
-def update_column(column: str, update_func: Callable) -> Callable:
+def update_column(column: str, update_func: Callable[..., Any]) -> Callable[..., Any]:
     """Apply a given function to a column in a given pandas DataFrame argument.
 
     Parameters
     ----------
     column : str
         The name of the column to update.
-    update_func : Callable
+    update_func : Callable[..., Any]
         The function to apply to the column.
 
     Returns
     -------
-    Callable
+    Callable[..., Any]
         The wrapped function.
 
     """
 
-    def update_column_wrap(func: Callable) -> Callable:
+    def update_column_wrap(func: Callable[..., Any]) -> Callable[..., Any]:
         """Apply a given function to a column in a given pandas DataFrame argument.
 
         Parameters
         ----------
-        func: Callable :
+        func: Callable[..., Any] :
             The input function.
 
         Returns
         -------
-        Callable
+        Callable[..., Any]
             The wrapped function.
 
         """
 
         @functools.wraps(func)
-        def wrapped_func(*args, **kwargs) -> Any:
+        def wrapped_func(*args: str, **kwargs: str) -> Any:
             apply_func = lambda df: df.assign(**{column: df[column].apply(update_func)})
             filter_func = lambda arg: type(arg) == pd.DataFrame
             args = override_args(args=args, func=apply_func, filter=filter_func)

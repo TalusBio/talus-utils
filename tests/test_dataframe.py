@@ -14,7 +14,7 @@ from talus_utils.fasta import parse_fasta_header_uniprot_protein
 DATA_DIR = Path(__file__).resolve().parent.joinpath("data")
 
 
-def assert_frame_not_equal(*args, **kwargs):
+def assert_frame_not_equal(*args: str, **kwargs: str) -> None:
     """Check that left and right DataFrame are unequal.
 
     Raises

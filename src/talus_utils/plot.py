@@ -2,7 +2,7 @@
 
 import functools
 
-from typing import Any, Callable, List, Set, Tuple
+from typing import Any, Callable, Dict, List, Optional, Set, Tuple
 
 import matplotlib.pyplot as plt
 import plotly.graph_objects as go
@@ -13,7 +13,7 @@ from scipy.special import binom
 from .constants import PRIMARY_COLOR, SECONDARY_COLOR
 
 
-def update_layout(*px_args, **px_kwargs) -> Callable:
+def update_layout(*px_args: str, **px_kwargs: str) -> Callable[..., Any]:
     """Override the layout of a Plotly Figure.
 
     Parameters
@@ -25,28 +25,28 @@ def update_layout(*px_args, **px_kwargs) -> Callable:
 
     Returns
     -------
-    Callable
+    Callable[..., Any]
         The wrapped function.
 
     """
 
-    def update_layout_wrap(func: Callable) -> Callable:
+    def update_layout_wrap(func: Callable[..., Any]) -> Callable[..., Any]:
         """Override the layout of a Plotly Figure.
 
         Parameters
         ----------
-        func: Callable :
+        func: Callable[..., Any] :
             The input function.
 
         Returns
         -------
-        Callable
+        Callable[..., Any]
             The wrapped function.
 
         """
 
         @functools.wraps(func)
-        def wrapped_func(*args, **kwargs) -> Any:
+        def wrapped_func(*args: Tuple[Any], **kwargs: Dict[str, str]) -> Any:
             return_value = func(*args, **kwargs)
             if type(return_value) == go.Figure:
                 return return_value.update_layout(*px_args, **px_kwargs)
@@ -58,10 +58,10 @@ def update_layout(*px_args, **px_kwargs) -> Callable:
 
 
 def venn(
-    sets: List[Set],
-    labels: List[str] = None,
-    dim: Tuple[int, int] = (None, None),
-    title: str = None,
+    sets: List[Set[str]],
+    labels: Optional[List[str]] = None,
+    dim: Tuple[Optional[int], Optional[int]] = (None, None),
+    title: Optional[str] = None,
     colors: Tuple[str, str] = (PRIMARY_COLOR, SECONDARY_COLOR),
 ) -> go.Figure:
     """Create a Venn Diagram Overlap Plot using Matplotlib and Plotly.
