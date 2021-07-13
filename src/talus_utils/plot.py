@@ -1,4 +1,4 @@
-"""src/talus_utils/plot.py"""
+"""src/talus_utils/plot.py module."""
 
 import functools
 
@@ -14,14 +14,36 @@ from .constants import PRIMARY_COLOR, SECONDARY_COLOR
 
 
 def update_layout(*px_args, **px_kwargs) -> Callable:
-    """Function decorator that overrides the layout of a Plotly Figure.
+    """Override the layout of a Plotly Figure.
 
-    Returns:
-        Callable: The wrapped function.
+    Parameters
+    ----------
+    px_args :
+        The positional arguments to pass to the Plotly Figure.
+    px_kwargs :
+        The keyword arguments to pass to the Plotly Figure.
+
+    Returns
+    -------
+    Callable
+        The wrapped function.
+
     """
 
     def update_layout_wrap(func: Callable) -> Callable:
-        """Function decorator that overrides the layout of a Plotly Figure."""
+        """Override the layout of a Plotly Figure.
+
+        Parameters
+        ----------
+        func: Callable :
+            The input function.
+
+        Returns
+        -------
+        Callable
+            The wrapped function.
+
+        """
 
         @functools.wraps(func)
         def wrapped_func(*args, **kwargs) -> Any:
@@ -40,19 +62,28 @@ def venn(
     labels: List[str] = None,
     dim: Tuple[int, int] = (None, None),
     title: str = None,
-    colors: Tuple[str, str] = [PRIMARY_COLOR, SECONDARY_COLOR],
+    colors: Tuple[str, str] = (PRIMARY_COLOR, SECONDARY_COLOR),
 ) -> go.Figure:
-    """Creates a Venn Diagram Overlap Plot using Matplotlib and Plotly.
+    """Create a Venn Diagram Overlap Plot using Matplotlib and Plotly.
 
-    Args:
-        sets (List[Set]): Sets to plot overlap for.
-        labels (List[str], optional): Label for each set. Defaults to None.
-        dim (Tuple[int, int], optional): The plot dimensions (width, height). Defaults to (None, None).
-        title (str, optional): The figure title. Defaults to None.
-        colors (Tuple[str, str], optional): Color to use for each set in the plot. Defaults to [PRIMARY_COLOR, SECONDARY_COLOR].
+    Parameters
+    ----------
+    sets : List[Set]
+        Sets to plot overlap for.
+    labels : List[str]
+        Label for each set. (Default value = None).
+    dim : Tuple[int, int]
+        The plot dimensions (width, height). (Default value = (None, None)).
+    title : str
+        The figure title. (Default value = None).
+    colors : Tuple[str
+        Color to use for each set in the plot. (Default value = (PRIMARY_COLOR, SECONDARY_COLOR)).
 
-    Returns:
-        fig (Figure): A plotly figure.
+    Returns
+    -------
+    fig : Figure
+        A plotly figure.
+
     """
     n_sets = len(sets)
 

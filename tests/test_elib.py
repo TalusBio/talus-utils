@@ -1,4 +1,4 @@
-"""tests/test_elib.py"""
+"""tests/test_elib.py module."""
 from pathlib import Path
 
 import pandas as pd

@@ -1,4 +1,4 @@
-"""src/talus_utils/algorithms.py"""
+"""src/talus_utils/algorithms.py module."""
 
 from typing import Tuple, Union
 
@@ -13,14 +13,20 @@ def get_hits_for_proteins(
     outlier_peptide_intensities: pd.DataFrame,
     peptide_df: pd.DataFrame,
 ) -> pd.DataFrame:
-    """Calculates the percentage of peptides that are a hit for a protein.
+    """Calculate the percentage of peptides that are a hit for a protein.
 
-    Args:
-        outlier_peptide_intensities (pd.DataFrame): A dataframe with the outliers peptide intensities.
-        peptide_df (pd.DataFrame): A transformed peptide.txt dataframe with columns: ["Peptide", "Protein", "NumPeptides"].
+    Parameters
+    ----------
+    outlier_peptide_intensities : pd.DataFrame
+        A dataframe with the outliers peptide intensities.
+    peptide_df : pd.DataFrame
+        A transformed peptide.txt dataframe with columns: ["Peptide", "Protein", "NumPeptides"].
 
-    Returns:
-        protein_df: A dataframe with the percentage of peptides that are a hit for a given protein.
+    Returns
+    -------
+    protein_df
+        A dataframe with the percentage of peptides that are a hit for a given protein.
+
     """
     protein_df = peptide_df[["Protein"]].drop_duplicates()
     # loop over each sample of the outlier peptide intensities and calculate the percentage of peptides that are a hit for a given protein
@@ -50,13 +56,20 @@ def get_outlier_peptide_intensities(
 ) -> Union[pd.DataFrame, Tuple[pd.DataFrame, pd.DataFrame]]:
     """For each sample, finds the peptides that are more than 2 standard deviations above or below the mean.
 
-    Args:
-        peptide_intensities (pd.DataFrame): A dataframe containing Peptides as index and intensities as values.
-        max_nan_values (int, optional): The maximum number of NaN values a peptide can have across samples. Defaults to MAX_NAN_VALUES_HIT_SELECTION.
-        split_above_below (bool, optional): If True, separate between outliers below and above the mean (returns two dataframes). Defaults to False.
+    Parameters
+    ----------
+    peptide_intensities : pd.DataFrame
+        A dataframe containing Peptides as index and intensities as values.
+    max_nan_values : int
+        The maximum number of NaN values a peptide can have across samples. (Default value = MAX_NAN_VALUES_HIT_SELECTION).
+    split_above_below : bool
+        If True, separate between outliers below and above the mean (returns two dataframes). (Default value = False).
 
-    Returns:
-        Union[pd.DataFrame, Tuple[pd.DataFrame, pd.DataFrame]]: A dataframe with the outliers peptides.
+    Returns
+    -------
+    Union[pd.DataFrame, Tuple[pd.DataFrame, pd.DataFrame]]
+        A dataframe with the outliers peptides.
+
     """
     # drop peptides with more than MAX_NAN_VALUES_HIT_SELECTION NaN values
     peptide_intensities = peptide_intensities.dropna(
@@ -91,14 +104,22 @@ def hit_selection(
     """Hit Selection algorithm. Takes a peptide intensity dataframe, with the Peptides as index and the intensities as the values.
     Calculcates how many peptides are 2 std devs above or below the mean and reports the associated protein.
 
-    Args:
-        peptide_df (pd.DataFrame): A raw peptide dataframe (peptides.txt).
-        min_peptides (int, optional): The minimum number of peptides a protein needs to have to be to be considered. Defaults to MIN_PEPTIDES_HIT_SELECTION.
-        max_nan_values (int, optional): The maximum number of NaN values a peptide can have across samples. Defaults to MAX_NAN_VALUES_HIT_SELECTION.
-        split_above_below (bool, optional): If True, separate between hits below and above the mean (returns two dataframes). Defaults to False.
+    Parameters
+    ----------
+    peptide_df : pd.DataFrame
+        A raw peptide dataframe (peptides.txt).
+    min_peptides : int
+        The minimum number of peptides a protein needs to have to be to be considered. (Default value = MIN_PEPTIDES_HIT_SELECTION).
+    max_nan_values : int
+        The maximum number of NaN values a peptide can have across samples. (Default value = MAX_NAN_VALUES_HIT_SELECTION).
+    split_above_below : bool
+        If True, separate between hits below and above the mean (returns two dataframes). (Default value = False).
 
-    Returns:
-        Union[pd.DataFrame, Tuple[pd.DataFrame, pd.DataFrame]]: A dataframe with the percentage of peptides that are a hit for a given protein.
+    Returns
+    -------
+    Union[pd.DataFrame, Tuple[pd.DataFrame, pd.DataFrame]]
+        A dataframe with the percentage of peptides that are a hit for a given protein.
+
     """
     peptide_intensities = peptide_df.drop(["Protein"], axis=1)
     peptide_intensities = peptide_intensities.drop_duplicates(subset="Peptide")
@@ -141,3 +162,45 @@ def hit_selection(
         )
 
         return protein_df
+
+
+def subcellular_enrichment_scores(
+    proteins_with_locations: pd.DataFrame, expected_fractions_of_locations: pd.DataFrame
+):
+    """Calculate the enrichment score for each location in the whole dataframe.
+
+    Parameters
+    ----------
+    proteins_with_locations : pd.DataFrame
+        A data frame containing 'Protein', 'Sample' and 'Main Location'.
+    expected_fractions_of_locations : pd.DataFrame
+        The expected fraction that each location should represent in a dataset.
+
+    Returns
+    -------
+    enrichment_scores : pd.Series
+        a pandas Series of enrichment scores
+
+    """
+    for sample in proteins_with_locations["Sample"].unique():
+        sample_df = proteins_with_locations.loc[
+            proteins_with_locations["Sample"] == sample
+        ]
+        # Calculate the fraction that each group (each location) represents of the whole dataset
+        total_proteins = sample_df["Protein"].nunique()
+        sample_df = sample_df.groupby("Main location", as_index=False).apply(
+            lambda location: location["Protein"].nunique() / total_proteins
+        )
+        sample_df.columns = ["Main location", sample]
+        expected_fractions_of_locations = pd.merge(
+            expected_fractions_of_locations, sample_df, on="Main location", how="left"
+        )
+        # Calculate the enrichment score by dividing the fraction of each location in the dataset by the expected fraction of each location
+        expected_fractions_of_locations[sample] /= expected_fractions_of_locations[
+            "Expected Fraction"
+        ]
+
+    expected_fractions_of_locations = expected_fractions_of_locations.drop(
+        ["Expected Fraction", "# of Proteins", "Total # of Proteins"], axis=1
+    )
+    return expected_fractions_of_locations.set_index("Main location")

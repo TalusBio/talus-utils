@@ -1,4 +1,4 @@
-"""tests/test_plot.py"""
+"""tests/test_plot.py module."""
 import plotly.express as px
 
 from talus_utils.plot import update_layout

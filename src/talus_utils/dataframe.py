@@ -1,4 +1,4 @@
-"""src/talus_utils/dataframe.py"""
+"""src/talus_utils/dataframe.py module."""
 
 import functools
 
@@ -11,17 +11,35 @@ from .utils import override_args, override_kwargs
 
 
 def copy(func: Callable) -> Callable:
-    """Function decorator that creates a deep copy of a given pandas DataFrame
-    and substitutes it in the arguments.
+    """Create a deep copy of a given pandas DataFrame and substitute it in the arguments.
+
+    Parameters
+    ----------
+    func: Callable :
+        The input function.
+
+    Returns
+    -------
+    Callable
+        The wrapped function.
     """
 
     @functools.wraps(func)
     def wrapped_func(*args, **kwargs) -> Any:
-        """A function wrapper that substitutes the arguments that are pandas DataFrames
-        with a deep copy.
+        """Substitute the arguments that are pandas DataFrames with a deep copy.
 
-        Returns:
-            Any: The return value of the function it wraps.
+        Parameters
+        ----------
+        args :
+            The arguments to the wrapped function.
+        kwargs :
+            The keyword arguments to the wrapped function.
+
+        Returns
+        -------
+        Any
+            The return value of the function it wraps.
+
         """
         apply_func = lambda df: df.copy(deep=True)
         filter_func = lambda arg: type(arg) == pd.DataFrame
@@ -34,14 +52,36 @@ def copy(func: Callable) -> Callable:
 
 
 def dropna(*pd_args, **pd_kwargs) -> Callable:
-    """Function decorator that drops NaN values in a pandas DataFrame argument.
+    """Drop NaN values in a pandas DataFrame argument.
 
-    Returns:
-        Callable: The wrapped function.
+    Parameters
+    ----------
+    pd_args :
+        The arguments to the wrapped function.
+    pd_kwargs :
+        The keyword arguments to the wrapped function.
+
+    Returns
+    -------
+    Callable
+        The wrapped function.
+
     """
 
     def dropna_wrap(func: Callable) -> Callable:
-        """Function decorator that drops NaN values in a pandas DataFrame argument."""
+        """Drop NaN values in a pandas DataFrame argument.
+
+        Parameters
+        ----------
+        func: Callable :
+            The input function.
+
+        Returns
+        -------
+        Callable
+            The wrapped function.
+
+        """
 
         @functools.wraps(func)
         def wrapped_func(*args, **kwargs) -> Any:
@@ -60,18 +100,36 @@ def dropna(*pd_args, **pd_kwargs) -> Callable:
 def log_scaling(
     log_function: Callable = np.log10, filter_outliers: bool = True
 ) -> Callable:
-    """Function decorator that applies a log scale to a given pandas DataFrame argument.
+    """Apply a log scale to a given pandas DataFrame argument.
 
-    Args:
-        log_function (Callable, optional): The logarithm function to apply. Defaults to np.log10.
-        filter_outliers (bool, optional): If False, set all values below 1 to 1 to ensure np.log works. Defaults to True.
+    Parameters
+    ----------
+    log_function : Callable
+        The logarithm function to apply. (Default value = np.log10).
+    filter_outliers : bool
+        If False, set all values below 1 to 1 to ensure np.log works. (Default value = True).
 
-    Returns:
-        Callable: The wrapped function.
+    Returns
+    -------
+    Callable
+        The wrapped function.
+
     """
 
     def log_scaling_wrap(func: Callable) -> Callable:
-        """Function decorator that applies a log scale to a given pandas DataFrame argument."""
+        """Apply a log scale to a given pandas DataFrame argument.
+
+        Parameters
+        ----------
+        func: Callable :
+            The input function.
+
+        Returns
+        -------
+        Callable
+            The wrapped function.
+
+        """
 
         @functools.wraps(func)
         def wrapped_func(*args, **kwargs) -> Any:
@@ -91,14 +149,36 @@ def log_scaling(
 
 
 def pivot_table(*pd_args, **pd_kwargs) -> Callable:
-    """Function decorator that applies a pivot to a pandas DataFrame argument.
+    """Apply a pivot to a pandas DataFrame argument.
 
-    Returns:
-        Callable: The wrapped function.
+    Parameters
+    ----------
+    pd_args :
+        The arguments to the wrapped function.
+    pd_kwargs :
+        The keyword arguments to the wrapped function.
+
+    Returns
+    -------
+    Callable
+        The wrapped function.
+
     """
 
     def pivot_table_wrap(func: Callable) -> Callable:
-        """Function decorator that applies a pivot to a given pandas DataFrame argument."""
+        """Apply a pivot to a given pandas DataFrame argument.
+
+        Parameters
+        ----------
+        func: Callable :
+            The input function.
+
+        Returns
+        -------
+        Callable
+            The wrapped function.
+
+        """
 
         @functools.wraps(func)
         def wrapped_func(*args, **kwargs) -> Any:
@@ -115,24 +195,38 @@ def pivot_table(*pd_args, **pd_kwargs) -> Callable:
 
 
 def normalize(how: str) -> Callable:
-    """Function decorator that applies a row or column normalization to a pandas DataFrame argument.
+    """Apply a row or column normalization to a pandas DataFrame argument.
 
-    Args:
-        how (str): The normalization method to apply. Can be one of {'row', 'colum', 'minmax', 'median_column'}.
+    Parameters
+    ----------
+    how : str
+        The normalization method to apply. Can be one of {'row', 'colum', 'minmax', 'median_column'}.
         'row': Normalize each row to the range [0, 1].
         'colum': Normalize each column to the range [0, 1].
         'minmax': Apply a min-max normalization.
         'median_column': Scale each column by subtracting the median value.
 
-    Raises:
-        ValueError: If the given argument is not one of {'row', 'colum', 'minmax'}.
+    Returns
+    -------
+    Callable
+        The wrapped function.
 
-    Returns:
-        Callable: The wrapped function.
     """
 
     def normalize_wrap(func: Callable) -> Callable:
-        """Function decorator that applies a row or column normalization to a pandas DataFrame argument."""
+        """Apply a row or column normalization to a pandas DataFrame argument.
+
+        Parameters
+        ----------
+        func: Callable :
+            The input function.
+
+        Returns
+        -------
+        Callable
+            The wrapped function.
+
+        """
 
         @functools.wraps(func)
         def wrapped_func(*args, **kwargs) -> Any:
@@ -163,22 +257,38 @@ def normalize(how: str) -> Callable:
 def sort_row_values(
     how: str, use_absolute_values: bool = False, sort_ascending: bool = False
 ) -> Callable:
-    """Function decorator that reindexes a pandas DataFrame argument.
+    """Reindex a pandas DataFrame argument.
 
-    Args:
-        how (str): The reindexing method to apply. Can be one of {'min', 'max', 'median', 'mean', 'sum'}.
-        use_absolute_values (bool, optional): If True, use absolute values of the row values. Defaults to False.
-        sort_ascending (bool, optional): Whether to sort the index in ascending order. Defaults to False.
+    Parameters
+    ----------
+    how : str
+        The reindexing method to apply. Can be one of {'min', 'max', 'median', 'mean', 'sum'}.
+    use_absolute_values : bool
+        If True, use absolute values of the row values. (Default value = False).
+    sort_ascending : bool
+        Whether to sort the index in ascending order. (Default value = False).
 
-    Raises:
-        ValueError: If the given argument is not one of {'min', 'max', 'median', 'mean', 'sum'}.
+    Returns
+    -------
+    Callable
+        The wrapped function.
 
-    Returns:
-        Callable: The wrapped function.
     """
 
     def reindex_wrap(func: Callable) -> Callable:
-        """Function decorator that reindexes a pandas DataFrame argument."""
+        """Reindexe a pandas DataFrame argument.
+
+        Parameters
+        ----------
+        func: Callable :
+            The input function.
+
+        Returns
+        -------
+        Callable
+            The wrapped function.
+
+        """
 
         @functools.wraps(func)
         def wrapped_func(*args, **kwargs) -> Any:
@@ -265,19 +375,38 @@ def sort_row_values(
 def explode(
     column: Union[str, Tuple], ignore_index: bool = False, sep: str = None
 ) -> Callable:
-    """Function decorator that explodes a column in a given pandas DataFrame argument.
+    """Explode a column in a given pandas DataFrame argument.
 
-    Args:
-        column (Union[str, Tuple]): The column to explode.
-        ignore_index (bool, optional): If True, the resulting index will be labeled 0, 1, …, n - 1.. Defaults to False.
-        sep (str, optional): The string to use to separate values in the resulting DataFrame. Defaults to None.
+    Parameters
+    ----------
+    column : Union[str, Tuple]
+        The column to explode.
+    ignore_index : bool
+        If True, the resulting index will be labeled 0, 1, …, n - 1. (Default value = False).
+    sep : str
+        The string to use to separate values in the resulting DataFrame. (Default value = None).
 
-    Returns:
-        Callable: The wrapped function.
+    Returns
+    -------
+    Callable
+        The wrapped function.
+
     """
 
     def explode_wrap(func: Callable) -> Callable:
-        """Function decorator that explodes a column in a given pandas DataFrame argument."""
+        """Explode a column in a given pandas DataFrame argument.
+
+        Parameters
+        ----------
+        func: Callable :
+            The input function.
+
+        Returns
+        -------
+        Callable
+            The wrapped function.
+
+        """
 
         @functools.wraps(func)
         def wrapped_func(*args, **kwargs) -> Any:
@@ -301,18 +430,36 @@ def explode(
 
 
 def update_column(column: str, update_func: Callable) -> Callable:
-    """Function decorator that applies a given function to a column in a given pandas DataFrame argument.
+    """Apply a given function to a column in a given pandas DataFrame argument.
 
-    Args:
-        column_name (str): The name of the column to update.
-        apply_func (Callable): The function to apply to the column.
+    Parameters
+    ----------
+    column : str
+        The name of the column to update.
+    update_func : Callable
+        The function to apply to the column.
 
-    Returns:
-        Callable: The wrapped function.
+    Returns
+    -------
+    Callable
+        The wrapped function.
+
     """
 
     def update_column_wrap(func: Callable) -> Callable:
-        """Function decorator that exploded a column in a given pandas DataFrame argument."""
+        """Apply a given function to a column in a given pandas DataFrame argument.
+
+        Parameters
+        ----------
+        func: Callable :
+            The input function.
+
+        Returns
+        -------
+        Callable
+            The wrapped function.
+
+        """
 
         @functools.wraps(func)
         def wrapped_func(*args, **kwargs) -> Any:

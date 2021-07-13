@@ -1,4 +1,4 @@
-"""src/talus_utils/constants.py"""
+"""src/talus_utils/constants.py module."""
 from typing import Final
 
 

@@ -1,4 +1,4 @@
-"""src/talus_utils/uniprot.py"""
+"""src/talus_utils/uniprot.py module."""
 from typing import Tuple
 
 
@@ -6,14 +6,21 @@ def parse_fasta_header(fasta_header: str) -> Tuple[str, str, str]:
     """Parse a fasta header with the following format: db|UniqueIdentifier|EntryName.
     https://www.uniprot.org/help/fasta-headers
 
-    Args:
-        fasta_header (str): A fasta header in the format: db|UniqueIdentifier|EntryName
+    Parameters
+    ----------
+    fasta_header : str
+        A fasta header in the format: db|UniqueIdentifier|EntryName.
 
-    Raises:
-        ValueError: If the fasta header doesn't follow the format: db|UniqueIdentifier|EntryName.
+    Returns
+    -------
+    Tuple[str, str, str]
+        The db, unique identifier and entry name of the fasta header.
 
-    Returns:
-        Tuple[str, str, str]: The db, unique identifier and entry name of the fasta header.
+    Raises
+    ------
+    ValueError
+        If the fasta header doesn't follow the format: db|UniqueIdentifier|EntryName.
+
     """
     db, unique_identifier, entry_name = fasta_header.split("|")
     if not db or not unique_identifier or not entry_name:
@@ -24,20 +31,25 @@ def parse_fasta_header(fasta_header: str) -> Tuple[str, str, str]:
 
 
 def parse_fasta_header_uniprot_entry(fasta_header: str) -> Tuple[str, str]:
-    """Extracts the Protein and Species name from a fasta header in the format:
-    db|UniqueIdentifier|EntryName. The EntryName field has the format
-    ProteinName_SpeciesName according to https://www.uniprot.org/help/entry_name
-    and this function extracts the Protein and Species name.
+    """Extract the Protein and Species name from a fasta header in the format: db|UniqueIdentifier|EntryName.
+    The EntryName field has the format ProteinName_SpeciesName according to
+    https://www.uniprot.org/help/entry_name and this function extracts the Protein and Species name.
 
-    Args:
-        fasta_header (str): [description]
+    Parameters
+    ----------
+    fasta_header : str
+        A fasta header in the format: db|UniqueIdentifier|EntryName.
 
-    Raises:
-        ValueError: If the fasta header EntryName doesn't follow the format: ProteinName_SpeciesName.
+    Returns
+    -------
+    Tuple[str, str]
+        The ProteinName and SpeciesName of the EntryName field of the given fasta header.
 
-    Returns:
-        Tuple[str, str]: The ProteinName and SpeciesName of the EntryName field
-        of the given fasta header.
+    Raises
+    ------
+    ValueError
+        If the fasta header EntryName doesn't follow the format: ProteinName_SpeciesName.
+
     """
     _, _, entry_name = parse_fasta_header(fasta_header=fasta_header)
     protein_name, species_name = entry_name.split("_")
@@ -49,19 +61,20 @@ def parse_fasta_header_uniprot_entry(fasta_header: str) -> Tuple[str, str]:
 
 
 def parse_fasta_header_uniprot_protein(fasta_header: str) -> str:
-    """Extracts the Protein name from a fasta header in the format:
-    db|UniqueIdentifier|EntryName. The EntryName field has the format
-    ProteinName_SpeciesName according to https://www.uniprot.org/help/entry_name
-    and this function extracts the Protein name.
+    """Extract the Protein name from a fasta header in the format: db|UniqueIdentifier|EntryName.
+    The EntryName field has the format ProteinName_SpeciesName according to
+    https://www.uniprot.org/help/entry_name and this function extracts the Protein name.
 
-    Args:
-        fasta_header (str): [description]
+    Parameters
+    ----------
+    fasta_header : str
+        A fasta header in the format: db|UniqueIdentifier|EntryName.
 
-    Raises:
-        ValueError: If the fasta header EntryName doesn't follow the format: ProteinName_SpeciesName.
+    Returns
+    -------
+    str
+        The ProteinName of the EntryName field of the given fasta header.
 
-    Returns:
-        str: The ProteinName of the EntryName field of the given fasta header.
     """
     protein_name, _ = parse_fasta_header_uniprot_entry(fasta_header=fasta_header)
     return protein_name
