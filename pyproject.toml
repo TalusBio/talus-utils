@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "talus-utils"
-version = "0.1.2"
+version = "0.1.3"
 description = "Talus Utils"
 authors = ["Rico Meinl <rmeinl@talus.bio>"]
 license = "MIT"
