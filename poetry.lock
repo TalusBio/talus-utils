@@ -1124,7 +1124,7 @@ pbr = ">=2.0.0,<2.1.0 || >2.1.0"
 
 [[package]]
 name = "talus-aws-utils"
-version = "0.0.3"
+version = "0.0.4"
 description = "Talus AWS Utils"
 category = "main"
 optional = false
@@ -1268,7 +1268,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytes
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.7.1,<4.0.0"
-content-hash = "b99eec634e1c71a91c6872bb536e56d13532decc90376862cb621a83d822d7b0"
+content-hash = "64252ee97f000d31c176afccd611da93ad62107d88e4c0c53e818a87fdeb8076"
 
 [metadata.files]
 alabaster = [
@@ -2012,8 +2012,8 @@ stevedore = [
     {file = "stevedore-3.3.0.tar.gz", hash = "sha256:3a5bbd0652bf552748871eaa73a4a8dc2899786bc497a2aa1fcb4dcdb0debeee"},
 ]
 talus-aws-utils = [
-    {file = "talus-aws-utils-0.0.3.tar.gz", hash = "sha256:35e9206b9f629beaffa2a78710a12d3dd9c2ea84b2da464032de309af0e11731"},
-    {file = "talus_aws_utils-0.0.3-py3-none-any.whl", hash = "sha256:0593955889635840cbb386d547b35051b5290349c54bea1e990641f8fcce7211"},
+    {file = "talus-aws-utils-0.0.4.tar.gz", hash = "sha256:a3578e24d3ce36455b124e892a904b431c08614b2d85f2e4a3f9b62a6cbee586"},
+    {file = "talus_aws_utils-0.0.4-py3-none-any.whl", hash = "sha256:19410a81661a4e61e473da7296866888e62b7bd834ff4abc44a61286a89f8b54"},
 ]
 tenacity = [
     {file = "tenacity-8.0.1-py3-none-any.whl", hash = "sha256:f78f4ea81b0fabc06728c11dc2a8c01277bfc5181b321a4770471902e3eb844a"},
