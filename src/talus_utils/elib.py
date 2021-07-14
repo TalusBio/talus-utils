@@ -1,10 +1,11 @@
 """src/talus_utils/elib.py module."""
+import os
 import sqlite3
 import tempfile
 
 from pathlib import Path
 from sqlite3.dbapi2 import Cursor
-from typing import Optional, Union
+from typing import Dict, Optional, Union
 
 import pandas as pd
 
@@ -24,18 +25,19 @@ class Elib:
         bucket : Optional[str], optional
             The name of the S3 bucket to load the file from, by default None
         """
+        self._tmp = None
         if not bucket:
-            self.file_name = key_or_filename
+            self._file_name = key_or_filename
         else:
             elib = _read_object(bucket=bucket, key=key_or_filename)
             elib_content = elib.read()
-            self.tmp = tempfile.NamedTemporaryFile()
-            self.tmp.write(elib_content)
-            self.file_name = self.tmp.name
+            self._tmp = tempfile.NamedTemporaryFile()
+            self._tmp.write(elib_content)
+            self._file_name = self._tmp.name
 
         # connect to tmp file
-        self.connection = sqlite3.connect(self.file_name)
-        self.cursor = self.connection.cursor()
+        self._connection = sqlite3.connect(self._file_name)
+        self._cursor = self._connection.cursor()
 
     def execute_sql(
         self, sql: str, use_pandas: Optional[bool] = False
@@ -57,10 +59,44 @@ class Elib:
 
         """
         if use_pandas:
-            return pd.read_sql_query(sql=sql, con=self.connection)
+            return pd.read_sql_query(sql=sql, con=self._connection)
         else:
-            return self.cursor.execute(sql)
+            return self._cursor.execute(sql)
 
     def close(self) -> None:
         """Close and remove the tmp file and the connection."""
-        self.tmp.close()
+        if self._tmp:
+            self._tmp.close()
+
+
+def get_unique_peptide_proteins(
+    elib_filename: Union[Path, str], bucket: Optional[str] = None
+) -> Dict[str, Union[int, str]]:
+    """Get the number of unique peptides and proteins in the given elib file.
+
+    Parameters
+    ----------
+    elib_filename : Union[Path, str]
+        The path to the elib file.
+    bucket : Optional[str], optional
+        The name of the bucket to use. (Default value = None)
+
+    Returns
+    -------
+    Dict[str, Union[int, str]]
+        A dictionary containing the sample name, number of unique peptides and proteins.
+    """
+    elib_conn = Elib(key_or_filename=elib_filename, bucket=bucket)
+    peptide_to_protein = elib_conn.execute_sql(
+        sql="SELECT PeptideSeq, ProteinAccession FROM peptidetoprotein WHERE isDecoy == 0;",
+        use_pandas=True,
+    )
+    sample_name = Path(os.path.basename(elib_filename)).with_suffix("").stem
+    unique_proteins = peptide_to_protein["ProteinAccession"].nunique()
+    unique_peptides = peptide_to_protein["PeptideSeq"].nunique()
+    elib_conn.close()
+    return {
+        "Sample Name": sample_name,
+        "Unique Proteins": unique_proteins,
+        "Unique Peptides": unique_peptides,
+    }

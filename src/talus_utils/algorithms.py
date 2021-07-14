@@ -1,5 +1,4 @@
 """src/talus_utils/algorithms.py module."""
-
 from typing import Tuple, Union
 
 import numpy as np
