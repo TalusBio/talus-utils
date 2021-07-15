@@ -20,7 +20,7 @@ except ImportError:
     raise SystemExit(dedent(message))
 
 
-package = "talus_aws_utils"
+package = "talus_utils"
 python_versions = ["3.9", "3.8", "3.7"]
 nox.needs_version = ">= 2021.6.6"
 nox.options.sessions = (

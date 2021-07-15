@@ -9,4 +9,4 @@ per-file-ignores = tests/*:S101
 exclude = .nox/*
 rst-roles = class,const,func,meth,mod,ref
 rst-directives = deprecated
-application-import-names = talus_aws_utils,tests
+application-import-names = talus_utils,tests

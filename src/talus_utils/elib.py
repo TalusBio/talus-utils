@@ -9,7 +9,7 @@ from typing import Dict, Optional, Union
 
 import pandas as pd
 
-from talus_aws_utils.s3 import _read_object
+from talus_utils.s3 import _read_object
 
 
 class Elib:
