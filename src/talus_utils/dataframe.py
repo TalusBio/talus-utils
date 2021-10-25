@@ -374,6 +374,39 @@ def sort_row_values(
     return reindex_wrap
 
 
+def explode_column(
+    df: pd.DataFrame,
+    column: str,
+    sep: Optional[str] = ";",
+    ignore_index: Optional[bool] = False,
+) -> pd.DataFrame:
+    """Explode a column in a given pandas DataFrame argument.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Input dataframe.
+    column : str
+        The column to explode.
+    sep : Optional[str], optional
+        The string to use to separate values in the resulting DataFrame. (Default value = None).
+    ignore_index : Optional[bool], optional
+        If True, the resulting index will be labeled 0, 1, …, n - 1. (Default value = False).
+
+    Returns
+    -------
+    pd.DataFrame
+        A DataFrame with the given column exploded.
+    """
+    return df.assign(
+        **{
+            column: df[column].apply(
+                lambda row: row.split(sep) if isinstance(row, str) else row
+            )
+        }
+    ).explode(column=column, ignore_index=ignore_index)
+
+
 def explode(
     column: str,
     ignore_index: Optional[bool] = False,
@@ -415,9 +448,9 @@ def explode(
         @functools.wraps(func)
         def wrapped_func(*args: str, **kwargs: str) -> Any:
             if sep:
-                apply_func = lambda df: df.assign(
-                    **{column: df[column].apply(lambda row: row.split(sep))}
-                ).explode(column=column, ignore_index=ignore_index)
+                apply_func = lambda df: explode_column(
+                    df=df, column=column, sep=sep, ignore_index=ignore_index
+                )
             else:
                 apply_func = lambda df: df.explode(
                     column=column, ignore_index=ignore_index

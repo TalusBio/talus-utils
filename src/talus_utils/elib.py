@@ -1,5 +1,4 @@
 """src/talus_utils/elib.py module."""
-import os
 import sqlite3
 import tempfile
 
@@ -91,7 +90,7 @@ def get_unique_peptide_proteins(
         sql="SELECT PeptideSeq, ProteinAccession FROM peptidetoprotein WHERE isDecoy == 0;",
         use_pandas=True,
     )
-    sample_name = Path(os.path.basename(elib_filename)).with_suffix("").stem
+    sample_name = Path(elib_filename).with_suffix("").stem
     unique_proteins = peptide_to_protein["ProteinAccession"].nunique()
     unique_peptides = peptide_to_protein["PeptideSeq"].nunique()
     elib_conn.close()
