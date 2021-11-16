@@ -192,9 +192,26 @@ def test_normalize_column() -> None:
 def test_normalize_median_column() -> None:
     """Test the normalize decorator with how='median_column'."""
     df_input = pd.DataFrame(np.random.rand(5, 5) * 100)
-    df_expected = df_input - df_input.median(axis=0)
+    df_expected = df_input / df_input.median(axis=0)
 
     df_actual = dataframe.normalize(how="median_column")(dummy_function)(df_input)
+    assert_frame_equal(df_actual, df_expected)
+
+
+def test_normalize_quantile_column() -> None:
+    """Test the normalize decorator with how='quantile_column'."""
+    df_input = pd.DataFrame(np.random.rand(5, 5) * 100)
+
+    rank_mean = (
+        df_input.stack()
+        .groupby(df_input.rank(method="first").stack().astype(int))
+        .mean()
+    )
+    df_expected = (
+        df_input.rank(method="min").stack().astype(int).map(rank_mean).unstack()
+    )
+
+    df_actual = dataframe.normalize(how="quantile_column")(dummy_function)(df_input)
     assert_frame_equal(df_actual, df_expected)
 
 

@@ -194,6 +194,39 @@ def pivot_table(*pd_args: str, **pd_kwargs: str) -> Callable[..., Any]:
     return pivot_table_wrap
 
 
+def median_normalize(df):
+    """Apply median normalization to input dataframe.
+
+    Parameters
+    ----------
+    df: pd.DataFrame
+        Input data frame.
+
+    Returns
+    -------
+    pd.DataFrame
+        Transformed output data frame.
+    """
+    return df / df.median()
+
+
+def quantile_normalize(df):
+    """Apply quantile normalization to input dataframe.
+
+    Parameters
+    ----------
+    df: pd.DataFrame
+        Input data frame.
+
+    Returns
+    -------
+    pd.DataFrame
+        Transformed output data frame.
+    """
+    rank_mean = df.stack().groupby(df.rank(method="first").stack().astype(int)).mean()
+    return df.rank(method="min").stack().astype(int).map(rank_mean).unstack()
+
+
 def normalize(how: str) -> Callable[..., Any]:
     """Apply a row or column normalization to a pandas DataFrame argument.
 
@@ -236,8 +269,10 @@ def normalize(how: str) -> Callable[..., Any]:
                 apply_func = lambda df: df.apply(lambda x: x / x.sum(), axis=0)
             elif how.lower() in set(["minmax", "min-max", "min_max"]):
                 apply_func = lambda df: (df - df.min()) / (df.max() - df.min())
-            elif how.lower() in set(["median_column", "median_col"]):
-                apply_func = lambda df: df - df.median(axis=0)
+            elif how.lower() in set(["median", "median_column", "median_col"]):
+                apply_func = lambda df: median_normalize(df)
+            elif how.lower() in set(["quantile", "quantile_column", "quantile_col"]):
+                apply_func = lambda df: quantile_normalize(df)
             else:
                 raise ValueError(
                     "Invalid input value for 'how'. Needs to be one of {'row', 'colum', 'minmax'}."
